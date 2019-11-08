@@ -1,8 +1,6 @@
 import copy
 
 root = None  # The logical root folder
-datanode_ips = []  # Public IP-addresses of the data nodes
-datanode_socks = []  # Sockets of the datanodes
 client_wd = '/'  # What folder a client is checking at the moment
 
 
@@ -125,13 +123,13 @@ class File:
     Attributes:
     - name      : name of the file
     - directory : a directory the file belongs to
-    - nodeIDs   : the IDs of the nodes where this file is located physically
+    - nodes   : the nodes where this file is located physically
     """
 
     def __init__(self, name):
         self.name = name
         self.directory = None
-        self.nodeIDs = []
+        self.nodes = []
 
     def getPath(self) -> str:
         """
@@ -272,6 +270,41 @@ def GetFile(path: str) -> 'File':
             return None
 
 
+def ChooseDataNodes(space_list: 'list') -> 'list':
+    """
+    Returns the list of data node IDs which have the most free space available
+    """
+
+    mx1 = 0
+    mx2 = 0
+    ind1 = 0
+    ind2 = 0
+
+    if space_list[0] > space_list[1]:
+        mx1 = space_list[0]
+        mx2 = space_list[1]
+        ind1 = 0
+        ind2 = 1
+
+    else:
+        mx1 = space_list[1]
+        mx2 = space_list[0]
+        ind1 = 1
+        ind2 = 0
+
+    for i in range(2, len(space_list)):
+        if space_list[i] > mx1:
+            mx2 = mx1
+            ind2 = ind1
+            mx1 = space_list[i]
+            ind1 = i
+        elif space_list[i] > mx2:
+            mx2 = space_list[i]
+            ind2 = i
+
+    return [ind1, ind2]
+
+
 def Initialize() -> None:
     """
     Used for initialization of the DFS
@@ -293,13 +326,13 @@ def Initialize() -> None:
     return byte_num
 
 
-def FileCreate(path: str, empty=True) -> str:
+def FileCreate(path: str, nodes=None, empty=True) -> str:
     """
     Creates a logical file
     ---
     Attributes:
-    - filename : the name of a new file
     - path     : the location of a new file
+    - nodes    : the IDs of the nodes on which the file will be stored
     - empty    : if true performs 'File create' command, performs 'File write' otherwise 
     ---
     Returns:
@@ -324,7 +357,7 @@ def FileCreate(path: str, empty=True) -> str:
 
     if dest != None:
         f = File(filename)
-
+        f.nodes = nodes
         dest.addFile(f)
         return f.getPath()
 
@@ -599,6 +632,8 @@ def main():
     print(FileRead('pikcha2.png'))
 
     print(IsEmpty('/mashinka/project/final_model'))
+
+    print(ChooseDataNodes([15, 50, 30, 340, 2800, 20000]))
 
     print()
 

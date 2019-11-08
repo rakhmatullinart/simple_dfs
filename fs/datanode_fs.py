@@ -3,7 +3,7 @@ import shutil as shu
 
 
 #root_path = '/var/storage' # The path to the local storage
-root_path = './tmp/'
+root_path = './tmp'
 
 node_id = 1 # Hardcoded node id (may be should be passed via command line arguments, idk)
 
@@ -77,12 +77,18 @@ def FileWrite(filepath: str, file_data) -> int:
     Returns:
     1 if OK, -1 if not OK
     """
+    
+    path = GetLocalPath(filepath)
+    i = len(path) - 1
+    filename = ''
+    while path[i] != '/':
+        filename += path[i]
+        i -= 1
+    path = path[:i+1]
+    filename = filename[::-1]
 
-    if os.path.isdir(root_path + filepath):
-
-        path = GetLocalPath(filepath)
-
-        f = open(path, "w+")
+    if os.path.isdir(path):
+        f = open(path + filename, "w+")
         if file_data != None:
             f.write(file_data)
         f.close()
@@ -245,8 +251,9 @@ def DirectoryMake(path: str) -> int:
         print('The given directory already exists!')
         return -1
 
-def DirectoryDelete(path) -> int:
+def DirectoryDelete(path: str) -> int:
     """
+    Deletes directory with any content in it
     """
 
     path = GetLocalPath(path)
@@ -277,7 +284,8 @@ def main():
     Initialize()
     DirectoryMake('/dir1')
     DirectoryMake('/dir1/dir11')
-    DirectoryDelete('/dir1/dir11')
+    FileCreate('/dir1/dir11/file1.txt')
+    #DirectoryDelete('/dir1')
 
     return
 
