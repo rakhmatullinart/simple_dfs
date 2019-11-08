@@ -1,9 +1,5 @@
 import socket
 import helpers as tools
-
-from fs import datanode_fs as fs
-
-
 class Datanode:
     
     def __init__(self ,my_port=18801):
@@ -14,6 +10,7 @@ class Datanode:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind(('', my_port))
+        self.sock.listen()
 
     
     def connect_to_server(self, ip='localhost', port=8801):
@@ -62,20 +59,15 @@ class Datanode:
             client.connect((client_ip, 7777))
             tools.send_file(client, input_path)
         if op == 'REMOVE':
-            if input_path == '/':
-                fs.Initialize()
             pass # rm
         if op == 'COPY':
             pass # cp input output
         if op == 'MOVE':
             pass # cp input output
-        if op == 'CREATE':
-            fs.FileCreate(input_path)
-            pass # touch
 
                 
         
+if __name__ == '__main__':
+    d = Datanode()
 
-d = Datanode()
-
-d.connect_to_server()
+    d.connect_to_server()

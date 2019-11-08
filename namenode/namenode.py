@@ -1,12 +1,8 @@
 import socket
-from fs import namenode_fs as fs
-
-
 class NameNode:
     
     def __init__(self):
-
-
+        import socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind(('', 8800))
@@ -64,19 +60,14 @@ class NameNode:
         if op == 'INIT':
             # rm -r /*
             # get fs size
-            size = fs.Initialize()
             self.client.send(b'100GB')
-            self.to_dn('all', 'REMOVE {}'.format('/*'))
+            self.to_dn('all', 'REMOVE {}'.format('/'))
         if op == 'CREATE':
             # touch 'filename'
-            if fs.FileCreate(input_path) != None:
-                print('CREATE {}'.format(input_path))
-                self.client.send(b'SUCCESS')
-            else:
-                self.client.send(b'ERROR CANT CREATE FILE')
-            self.to_dn('all', 'CREATE {}'.format(input_path))
+            print('CREATE {}'.format(input_path))
+            self.client.send(b'SUCCESS')
         if op == 'WRITE':
-            print('WRITE')
+            print('WRITE ')
             self.client.send(b'SUCCESS')
             # define datanodes to store
             self.to_dn(1, 'WRITE {} {} {}'.format(input_path, client_ip, 
@@ -123,7 +114,7 @@ class NameNode:
             
 
             
+if __name__ == '__main__':
+    n = NameNode()
 
-n = NameNode()
-
-n.start_server()
+    n.start_server()

@@ -1,8 +1,6 @@
 import socket, os
 import helpers as tools
 
-from fs import datanode_fs as fs
-
 class Datanode:
     
     def __init__(self, my_port=18802):
@@ -16,7 +14,7 @@ class Datanode:
         self.sock.listen()
         self.client = socket.socket()
     
-    def connect_to_server(self, ip='localhost', port=8802):
+    def connect_to_server(self, ip='localhost', port=8800):
         self.namenode.connect((ip,port))
         while True:
             data = self.namenode.recv(1500)
@@ -37,13 +35,6 @@ class Datanode:
         print('path1: ', input_path)
         print('path2: ', client_ip)
         print('replicato: ', replica_ip)
-        if op == 'WRITE_REPL':
-            print('Going to recv file {}'.format(input_path))
-            source_dn, source_addr = self.sock.accept()
-            print(str(source_addr) + ' connected as datanode')
-            source_dn = socket.socket()
-            source_dn.connect((source_addr[0], 18801))
-            source_dn.send(b'SUCCESS')
         if op == 'WRITE':
             client = socket.socket()
             client.connect((client_ip, 7777))
@@ -55,27 +46,28 @@ class Datanode:
             result = replica.recv(10)
             print(result)
             client = socket.socket()
-            client.connect((client_ip, 7777))
+            client.connect((client_ip,7777))
             client.send(result)
         if op == 'READ':
             client = socket.socket()
             client.connect((client_ip, 7777))
             tools.send_file(client, input_path)
+        if op == 'WRITE_REPL':
+            source_dn, source_addr = self.sock.accept()
+            tools.recv_file(source_dn, input_path+str('REPL'))
+            source_dn = socket.socket()
+            source_dn.connect((source_addr[0], 18801))
+            source_dn.send(b'SUCCESS')
         if op == 'REMOVE':
-            if input_path == '/':
-                fs.Initialize()
-            pass  # rm
+            pass # rm
         if op == 'COPY':
-            pass  # cp input output
+            pass # cp input output
         if op == 'MOVE':
-            pass  # cp input output
-        if op == 'CREATE':
-            fs.FileCreate(input_path)
-            pass  # touch
+            pass # cp input output
 
-                
-        
 
-d = Datanode()
 
-d.connect_to_server(port=8802)
+if __name__ == '__main__':
+    d = Datanode()
+
+    d.connect_to_server(port=8802)
