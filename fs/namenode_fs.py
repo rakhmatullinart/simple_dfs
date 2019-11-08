@@ -2,7 +2,7 @@ import copy
 
 root = None  # The logical root folder
 client_wd = '/'  # What folder a client is checking at the moment
-
+free_space = 10**6
 
 class Directory:
     """
@@ -130,6 +130,7 @@ class File:
         self.name = name
         self.directory = None
         self.nodes = []
+        self.size = 0
 
     def getPath(self) -> str:
         """
@@ -267,7 +268,7 @@ def GetFile(path: str) -> 'File':
 
         else:
             print('The directory', abs_path, 'does not exists!')
-            return None
+            return -1
 
 
 def ChooseDataNodes(space_list: 'list') -> 'list':
@@ -326,7 +327,7 @@ def Initialize() -> None:
     return byte_num
 
 
-def FileCreate(path: str, nodes=None, empty=True) -> str:
+def FileCreate(path: str, filesize=0, nodes=None, empty=True) -> str:
     """
     Creates a logical file
     ---
@@ -338,8 +339,17 @@ def FileCreate(path: str, nodes=None, empty=True) -> str:
     Returns:
     Absolute DFS path if OK, None if not OK
     """
+    global free_space
 
+    if filesize != 0:
+        if filesize > free_space:
+            print('Too big file!')
+            return None
+
+    free_space -= filesize
+    
     abs_path = GetAbsolutePath(path)
+
     filename = abs_path[-1]
     path = '/'
     for d in abs_path[1:-1]:
@@ -350,14 +360,12 @@ def FileCreate(path: str, nodes=None, empty=True) -> str:
             print('A filename should not contain \'/\' character!')
             return None
 
-    if len(abs_path) == 2:
-        path = client_wd
-
     dest = GetDir(path)
 
     if dest != None:
         f = File(filename)
         f.nodes = nodes
+        f.size = filesize
         dest.addFile(f)
         return f.getPath()
 
@@ -366,13 +374,13 @@ def FileCreate(path: str, nodes=None, empty=True) -> str:
         return None
 
 
-def FileWrite(path: str) -> str:
+def FileWrite(path: str, nodes=None, filesize=0) -> str:
     """
     Returns:
     Absolute DFS path if OK, None if not OK
     """
 
-    return FileCreate(path, False)
+    return FileCreate(path, nodes=nodes, filesize=filesize, empty=False)
 
 
 def FileRead(path: str) -> str:
@@ -395,13 +403,16 @@ def FileDelete(path: str) -> str:
     Absolute DFS path of deleted file if OK, None if not OK
     """
 
+    global free_space
+
     f = GetFile(path)
 
     if f == None:
         return None
 
     res_path = f.getPath()
-    f.directory.removeFile(f)
+    free_space += f.size
+    f.directory.removeFile(f.name)
 
     return res_path
 
@@ -578,6 +589,9 @@ def DirDelete(path: str) -> str:
     if dr == None:
         return None
 
+    # Add free space
+    FreeSpace(dr)
+
     res_path = dr.getPath()
     dr.parent.removeDir(dr.name)
     return res_path
@@ -602,6 +616,22 @@ def IsEmpty(path: str) -> bool:
 
     return is_subs_empty
 
+
+def FreeSpace(dr: 'Directory') -> None:
+    """
+    """
+    
+    global free_space
+
+    for f in dr.files:
+        free_space += f.size
+
+    for d in dr.subDirs:
+        FreeSpace(d)
+
+    return
+
+
 def main():
     Initialize()
     print()
@@ -621,10 +651,10 @@ def main():
     print(DirCreate('baseline_model'))
     print(DirCreate('final_model'))
     print(DirCreate('final_model/some_dir'))
-    print(FileCreate('report2.txt', './'))
+    print(FileCreate('report2.txt'))
 
     print(DirOpen('/pictures/'))
-    print(FileWrite('pikcha1.png'))
+    print(FileWrite('pikcha1.png', filesize=500))
     print(FileCreate('pikcha2.png'))
     print(FileCopy('pikcha2.png', '/mashinka'))
     print(FileMove('pikcha1.png', '/mashinka/project/baseline_model'))
@@ -635,6 +665,14 @@ def main():
 
     print(ChooseDataNodes([15, 50, 30, 340, 2800, 20000]))
 
+    print()
+    print(free_space)
+    print(FileWrite('someFile.dat', filesize=500))
+    print(FileDelete('someFile.dat'))
+
+    print(DirDelete('/mashinka'))
+
+    print(free_space)
     print()
 
     root.printFullTree()
