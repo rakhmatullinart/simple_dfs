@@ -60,6 +60,14 @@ class Directory:
                 return d
         return None
 
+    def removeDir(self, dirname: str) -> None:
+        for d in self.subDirs:
+            if d.name == dirname:
+                self.subDirs.remove(d)
+                return
+        print('There is no directory', dirname, 'in', self.name, '!')
+        return
+
     def getPath(self) -> str:
         """
         Returns the absolute location of a directory
@@ -534,26 +542,32 @@ def DirDelete(path: str) -> str:
 
     dr = GetDir(path)
 
-    file_num = len(dr.files)
-    # Count files in all subdirectories
+    if dr == None:
+        return None
 
-    if file_num == 0:
-        res_path = dr.getPath()
-        dr.parent.removeDir(dr.name)
-        # TODO: if empty delete
-        return res_path
-    else:
-        # Ask for deletion of non-empty directory
-        accepted = False
+    res_path = dr.getPath()
+    dr.parent.removeDir(dr.name)
+    return res_path
 
-        if accepted:
-            res_path = dr.getPath()
-            dr.parent.removeDir(dr.name)
-            return res_path
+def IsEmpty(path: str) -> bool:
+    """
+    Returns True if given directory contains files and False otherwise
+    """
 
-        else:
-            return None
+    d = GetDir(path)
 
+    if d == None:
+        print('The directory', d.getPath(), 'does not exists!')
+        return None
+
+    if len(d.files) > 0:
+        return False
+    
+    is_subs_empty = True
+    for sd in d.subDirs:
+        is_subs_empty = is_subs_empty & IsEmpty(sd.getPath())
+
+    return is_subs_empty
 
 def main():
     Initialize()
@@ -573,6 +587,7 @@ def main():
     print(DirOpen('./project'))
     print(DirCreate('baseline_model'))
     print(DirCreate('final_model'))
+    print(DirCreate('final_model/some_dir'))
     print(FileCreate('report2.txt', './'))
 
     print(DirOpen('/pictures/'))
@@ -582,6 +597,8 @@ def main():
     print(FileMove('pikcha1.png', '/mashinka/project/baseline_model'))
 
     print(FileRead('pikcha2.png'))
+
+    print(IsEmpty('/mashinka/project/final_model'))
 
     print()
 

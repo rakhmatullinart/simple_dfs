@@ -3,7 +3,7 @@ import shutil as shu
 
 
 #root_path = '/var/storage' # The path to the local storage
-root_path = './tmp'
+root_path = './tmp/'
 
 node_id = 1 # Hardcoded node id (may be should be passed via command line arguments, idk)
 
@@ -17,9 +17,13 @@ def Initialize() -> int:
     Returns:
     - number of bytes that available for storage
     """
+       
+    for root, dirs, files in os.walk(root_path):
+        for f in files:
+            os.unlink(os.path.join(root, f))
+        for d in dirs:
+            shu.rmtree(os.path.join(root, d)) 
     
-    shu.rmtree(root_path)
-
     total, used, free = shu.disk_usage(root_path)
     
     if log:
@@ -219,30 +223,43 @@ def FileMove(filepath: str, dest: str) -> int:
         print('The directory', dest, 'does not exists!')
         return -1
 
-def DirectoryMake(parent_path: str, name: str) -> int:
+def DirectoryMake(path: str) -> int:
     """
     Creates new directory in given path
     ---
     Attributes:
-    - parent_path: path of the directory in which the new one should be created
-    - name: name of the new directory
     ---
     Returns:
     1 if OK, -1 if not OK
     """
 
-    if parent_path == '':
-        parent_path = '/'
-
-    path = GetLocalPath(parent_path) + '/' + name
+    path = GetLocalPath(path)
 
     if not os.path.exists(path):
         os.makedirs(path)
         if log:
             print('A new directory', path, ' was created.')
         return 1
+    
     else:
         print('The given directory already exists!')
+        return -1
+
+def DirectoryDelete(path) -> int:
+    """
+    """
+
+    path = GetLocalPath(path)
+
+    if os.path.exists(path):
+        if log:
+            shu.rmtree(path)
+             
+            print('The directory', path, ' was deleted.')
+        return 1
+    
+    else:
+        print('The directory', path, 'does not exists!')
         return -1
 
 def GetLocalPath(dfs_path: str) -> str:
@@ -257,6 +274,10 @@ def GetLocalPath(dfs_path: str) -> str:
 
 def main():
     
+    Initialize()
+    DirectoryMake('/dir1')
+    DirectoryMake('/dir1/dir11')
+    DirectoryDelete('/dir1/dir11')
 
     return
 
