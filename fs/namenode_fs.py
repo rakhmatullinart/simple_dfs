@@ -497,6 +497,9 @@ def FileInfo(path: str) -> str:
 
     info += 'Name: ' + f.name + '\n'
     info += 'Path: ' + f.getPath() + '\n'
+    info += 'Replicas: ' + str(f.nodes) + '\n'
+    info += 'Size: (bytes)' + str(f.size) + '\n'
+
 
     return info
 
@@ -511,14 +514,17 @@ def FileCopy(path: str, dest: str) -> str:
     f = GetFile(path)
 
     if f == None:
+        print("FILEERROR", f)
         return None
 
     d = GetDir(dest)
 
     if d == None:
+        print("DIRERROR", f)
         return None
 
     if d == f.directory:
+        # print("ERROew", f)
         print('Cannot place copy into one directory with the original file!')
         return None
 
@@ -636,8 +642,8 @@ def DirRead(path: str) -> str:
 
     info += 'Files:\n'
     for f in dr.files:
-        info += ' ' * 2 + f.name + '\n'
-
+        info += ' ' * 2 + f.name + '    '
+        info += ' ' * 2 + str(f.nodes) + '\n'
     info += 'Subdirectories:\n'
     for d in dr.subDirs:
         info += ' ' * 2 + d.name + '\n'

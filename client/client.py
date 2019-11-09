@@ -125,6 +125,13 @@ class Client:
         self.namenode.send(str.encode(msg))
         data = self.namenode.recv(1024).decode()
         print('Status: {}'.format(data))
+        if data.split(' ')[0] == 'ACCEPT':
+            print('Are you sure you want delete non-empty directory? YES/NO')
+            answer = input()
+            self.namenode.send(str.encode(answer))
+            data = self.namenode.recv(1024).decode()
+            print('Status: {}'.format(data))
+            return
         if data.split(' ')[0] == 'ERROR':
             if len(data.split(' ')) > 1: print(data.split(' ')[1])
             return
