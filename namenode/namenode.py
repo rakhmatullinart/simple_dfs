@@ -17,7 +17,9 @@ class NameNode:
         self.clients = []
         self.sockets = None
         self.datanodes = {'datanode1': ('localhost', 8801),  # my port I'' rceive connectoins on
-                          'datanode2': ('localhost', 8802)}
+                          'datanode2': ('localhost', 8802),
+                          'datanode3': ('localhost', 8803),
+                          }
 
     def start_server(self):
         print('Waiting datanodes to connect.')
@@ -95,7 +97,8 @@ class NameNode:
                                                                                 self.datanodes[dn_to][0],
                                                                                 '1' + str(self.datanodes[dn_to][1])))
                     self.to_dn(dn_to, 'WRITE_REPL {} _ _ {}'.format(path, '1' + str(self.datanodes[dn_from][1])))
-            for key in fallen_nodes: self.datanodes.pop(key, None)
+            for key in fallen_nodes: self.datanodes.pop(key, None) # rm fallen nodes from their respective placeholders
+            for key in fallen_nodes: self.sockets.pop(key, None)
             print('new dns: ', self.datanodes)
             print('WRITE')
             # check if possible to store file
@@ -141,7 +144,8 @@ class NameNode:
             self.to_dn(1, 'MOVE {} {}'.format(input_path, output_path))
             self.to_dn(2, 'MOVE {} {}'.format(input_path, output_path))
         if op == 'READDIR':
-            self.client.send(b'SUCCESS fileList')
+            msg = 'SUCCESS\n {}'.format(fs.DirRead(input_path))
+            self.client.send(msg.encode())
             # define datanodes
         if op == 'READDIR':
             self.client.send(b'SUCCESS fileList')

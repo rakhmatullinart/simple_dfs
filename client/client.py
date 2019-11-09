@@ -96,7 +96,7 @@ class Client:
     def read_dir(self, init_path):
         msg = 'READDIR {}'.format(init_path)
         self.namenode.send(str.encode(msg))
-        data = self.namenode.recv(1024).decode()
+        data = self.namenode.recv(8192).decode()
         print('Status: {}'.format(data))
         if data.split(' ')[0] == 'ERROR':
             if len(data.split(' ')) > 1: print(data.split(' ')[1])
@@ -139,6 +139,7 @@ if __name__ == '__main__':
     option = input()
     tokens = option.split(' ')
     while tokens[0] != 'exit':
+        option = tokens[0]
         if option =='write':
             # 1 arg is local file, 2 arg is DFS path
             c.upload(tokens[1], tokens[2])

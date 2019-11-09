@@ -7,7 +7,7 @@ from fs import datanode_fs as fs
 
 class Datanode:
     
-    def __init__(self ,my_port=18801):
+    def __init__(self, my_port=18803):
         """
         nn_ip: ip of Namenode
         """
@@ -16,9 +16,9 @@ class Datanode:
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind(('', my_port))
         self.sock.listen()
-
+        self.client = socket.socket()
     
-    def connect_to_server(self, ip='localhost', port=8801):
+    def connect_to_server(self, ip='localhost', port=8803):
         self.namenode.connect((ip,port))
         while True:
             data = self.namenode.recv(1500)
@@ -109,6 +109,5 @@ class Datanode:
 
 
 if __name__ == '__main__':
-    d = Datanode()
-
-    d.connect_to_server(port=8801)
+    d = Datanode(my_port=18803)
+    d.connect_to_server(port=8803)

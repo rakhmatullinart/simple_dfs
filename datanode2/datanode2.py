@@ -1,7 +1,7 @@
-import socket, os
+import socket
+import helpers as tools
 import sys
 sys.path.insert(0, '..')
-import helpers as tools
 from fs import datanode_fs as fs
 
 
@@ -18,7 +18,7 @@ class Datanode:
         self.sock.listen()
         self.client = socket.socket()
     
-    def connect_to_server(self, ip='localhost', port=8800):
+    def connect_to_server(self, ip='localhost', port=8802):
         self.namenode.connect((ip,port))
         while True:
             data = self.namenode.recv(1500)
@@ -39,8 +39,17 @@ class Datanode:
         print('op: ', op)
         print('path1: ', input_path)
         print('path2: ', client_ip)
-        print('replicato: ', replica_ip)
+        print('replicaIP: ', replica_ip)
         print('replicaPORT: ', replica_port)
+        if op == 'WRITE_REPL':
+            print('Going to recv file {}'.format(input_path))
+            source_dn, source_addr = self.sock.accept()
+            tools.recv_file(source_dn, fs.GetLocalPath(input_path) + str('REPL'))
+
+            # send response to peer
+            source_dn = socket.socket()
+            source_dn.connect((source_addr[0], int(replica_port)))
+            source_dn.send(b'SUCCESS')
         if op == 'WRITE':
             # download file from client
             client = socket.socket()
@@ -57,7 +66,7 @@ class Datanode:
             result = replica.recv(10)
             print(result)
 
-            #send response to replica
+            # send response to client
             client = socket.socket()
             client.connect((client_ip, 7777))
             client.send(result)
@@ -66,18 +75,9 @@ class Datanode:
             client = socket.socket()
             client.connect((client_ip, 7777))
             tools.recv_file(client, fs.GetLocalPath(input_path))
-            client.send(b'SUCCESS')
-        if op == 'READ':
             client = socket.socket()
             client.connect((client_ip, 7777))
-            tools.send_file(client, input_path)
-        if op == 'WRITE_REPL':
-            source_dn, source_addr = self.sock.accept()
-            tools.recv_file(source_dn, fs.GetLocalPath(input_path)+str('REPL'))
-            source_dn = socket.socket()
-            print((source_addr[0], int(replica_port)))
-            source_dn.connect((source_addr[0], int(replica_port)))
-            source_dn.send(b'SUCCESS')
+            client.send(b'SUCCESS')
         if op == 'WRITE_EXISTING_REPL':
             # send file to replica
             replica = socket.socket()
@@ -88,10 +88,13 @@ class Datanode:
             replica, addr = self.sock.accept()
             result = replica.recv(10)
             print(result)
+        if op == 'READ':
+            client = socket.socket()
+            client.connect((client_ip, 7777))
+            tools.send_file(client, input_path)
         if op == 'REMOVE':
             if input_path == '/':
                 fs.Initialize()
-
             pass # rm
         if op == 'COPY':
             pass # cp input output
