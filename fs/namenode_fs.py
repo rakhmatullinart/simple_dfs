@@ -743,7 +743,7 @@ def main():
     print(ChooseDataNodes([15, 50, 30, 340, 2800, 20000]))
 
     print(free_space)
-    print(FileWrite('someFile.dat', filesize=500))
+    #print(FileWrite('someFile.dat', filesize=500))
     print(FileDelete('someFile.dat'))
 
     print(DirDelete('/mashinka'))
@@ -756,13 +756,7 @@ def main():
     print(DirCreate('/dir1/dir2/dir3'))
     print(DirCreate('/dir1/dir2/dir3/dir4'))
 
-    print(FileWrite('a.dat', nodes=['1','2'], filesize=100))
-    print(FileWrite('/dir1/b.dat', nodes=['2','3'], filesize=100))
-    print(FileWrite('/dir1/dir2/c.dat', nodes=['3','4'], filesize=100))
-    print(FileWrite('/dir1/dir2/dir3/d.dat', nodes=['4','5'], filesize=100))
-    print(FileWrite('/dir1/dir2/dir3/dir4/e.dat', nodes=['5','6'], filesize=100))
-
-    print(GetFilesToReplicate(fallen=['4'], was_alive=['1','2','3','4','5','6']))
+    print(GetFilesToReplicate(fallen=['2'], was_alive=['1','2']))
 
     print(DirDelete('dir1'))
 
