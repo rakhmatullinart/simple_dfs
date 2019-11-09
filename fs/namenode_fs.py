@@ -153,6 +153,72 @@ class File:
         return result
 
 
+def ListDiff(first, second):
+    """
+    Helper function
+    """
+    second = set(second)
+    return [item for item in first if item not in second]
+
+
+def GetFilesToReplicate(fallen, was_alive, is_root=True, dr=None) -> 'list':
+    """
+    """
+
+    alive = ListDiff(was_alive, fallen)
+
+    files_to_replicate = []
+
+    if is_root:
+        for f in root.files:
+            if f.nodes != None:
+                for node in f.nodes:
+                    if node not in alive:
+
+                        f.nodes.remove(node)
+                        
+                        node_receiver = ''
+                        if len(f.nodes) != 0:
+                            node_sender = f.nodes[0]
+                        for rec_node in alive:
+                            if rec_node not in f.nodes:
+                                f.nodes.append(rec_node)
+                                node_receiver = rec_node
+                                break
+                        
+                        files_to_replicate.append((f.getPath(), node_sender, node_receiver))
+                        break
+
+        for d in root.subDirs:
+            files_to_replicate += GetFilesToReplicate(fallen, was_alive, is_root=False, dr=d)
+
+    else:
+        for f in dr.files:
+            if f.nodes != None:
+                for node in f.nodes:
+                    if node not in alive:
+
+                        f.nodes.remove(node)
+                        
+                        node_receiver = ''
+                        node_sender = ''
+                        if len(f.nodes) != 0:
+                            node_sender = f.nodes[0]
+                        for rec_node in alive:
+                            if rec_node not in f.nodes:
+                                f.nodes.append(rec_node)
+                                node_receiver = rec_node
+                                break
+                        
+                        files_to_replicate.append((f.getPath(), node_sender, node_receiver))
+                        break 
+
+        for d in dr.subDirs:
+            files_to_replicate += GetFilesToReplicate(fallen, was_alive, is_root=False, dr=d)
+
+    return files_to_replicate
+
+
 def GetAbsolutePath(some_path: str) -> 'list of str':
     """
     Converts any path to an absolute path in list form
@@ -451,6 +517,10 @@ def FileCopy(path: str, dest: str) -> str:
     if d == None:
         return None
 
+    if d == f.directory:
+        print('Cannot place copy into one directory with the original file!')
+        return None
+
     f_copy = copy.deepcopy(f)
 
     d.addFile(f_copy)
@@ -580,6 +650,8 @@ def DirDelete(path: str) -> str:
     Absolute DFS path of the directory to be deleted if OK, None if not OK
     """
 
+    global client_wd
+
     if path == '/':
         print('You cannot delete root directory! Use \'Initialization\' command instead.')
         return None
@@ -593,7 +665,12 @@ def DirDelete(path: str) -> str:
     FreeSpace(dr)
 
     res_path = dr.getPath()
-    dr.parent.removeDir(dr.name)
+    parent = dr.parent
+    parent.removeDir(dr.name)
+
+    if GetDir(client_wd) == None:
+        client_wd = parent.getPath()
+
     return res_path
 
 def IsEmpty(path: str) -> bool:
@@ -656,7 +733,7 @@ def main():
     print(DirOpen('/pictures/'))
     print(FileWrite('pikcha1.png', filesize=500))
     print(FileCreate('pikcha2.png'))
-    print(FileCopy('pikcha2.png', '/mashinka'))
+    print(FileCopy('pikcha2.png', './'))
     print(FileMove('pikcha1.png', '/mashinka/project/baseline_model'))
 
     print(FileRead('pikcha2.png'))
@@ -665,16 +742,36 @@ def main():
 
     print(ChooseDataNodes([15, 50, 30, 340, 2800, 20000]))
 
-    print()
     print(free_space)
     print(FileWrite('someFile.dat', filesize=500))
     print(FileDelete('someFile.dat'))
 
     print(DirDelete('/mashinka'))
+    print(DirDelete('/pictures'))
+
+    print('Client wd', client_wd)
+
+    print(DirCreate('/dir1'))
+    print(DirCreate('/dir1/dir2'))
+    print(DirCreate('/dir1/dir2/dir3'))
+    print(DirCreate('/dir1/dir2/dir3/dir4'))
+
+    print(FileWrite('a.dat', nodes=['1','2'], filesize=100))
+    print(FileWrite('/dir1/b.dat', nodes=['2','3'], filesize=100))
+    print(FileWrite('/dir1/dir2/c.dat', nodes=['3','4'], filesize=100))
+    print(FileWrite('/dir1/dir2/dir3/d.dat', nodes=['4','5'], filesize=100))
+    print(FileWrite('/dir1/dir2/dir3/dir4/e.dat', nodes=['5','6'], filesize=100))
+
+    print(GetFilesToReplicate(fallen=['4'], was_alive=['1','2','3','4','5','6']))
+
+    print(DirDelete('dir1'))
 
     print(free_space)
     print()
 
+    
+
+    print()
     root.printFullTree()
     print()
 
