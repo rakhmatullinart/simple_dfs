@@ -178,13 +178,15 @@ def GetFilesToReplicate(fallen, was_alive, is_root=True, dr=None) -> 'list':
                         f.nodes.remove(node)
                         
                         node_receiver = ''
+                        if len(f.nodes) != 0:
+                            node_sender = f.nodes[0]
                         for rec_node in alive:
                             if rec_node not in f.nodes:
                                 f.nodes.append(rec_node)
                                 node_receiver = rec_node
                                 break
                         
-                        files_to_replicate.append((f.getPath(), node_receiver))
+                        files_to_replicate.append((f.getPath(), node_sender, node_receiver))
                         break
 
         for d in root.subDirs:
@@ -199,13 +201,16 @@ def GetFilesToReplicate(fallen, was_alive, is_root=True, dr=None) -> 'list':
                         f.nodes.remove(node)
                         
                         node_receiver = ''
+                        node_sender = ''
+                        if len(f.nodes) != 0:
+                            node_sender = f.nodes[0]
                         for rec_node in alive:
                             if rec_node not in f.nodes:
                                 f.nodes.append(rec_node)
                                 node_receiver = rec_node
                                 break
                         
-                        files_to_replicate.append((f.getPath(), node_receiver))
+                        files_to_replicate.append((f.getPath(), node_sender, node_receiver))
                         break 
 
         for d in dr.subDirs:
@@ -757,7 +762,7 @@ def main():
     print(FileWrite('/dir1/dir2/dir3/d.dat', nodes=['4','5'], filesize=100))
     print(FileWrite('/dir1/dir2/dir3/dir4/e.dat', nodes=['5','6'], filesize=100))
 
-    print(GetFilesToReplicate(fallen=['3'], was_alive=['1','2','3','4','5','6']))
+    print(GetFilesToReplicate(fallen=['4'], was_alive=['1','2','3','4','5','6']))
 
     print(DirDelete('dir1'))
 
