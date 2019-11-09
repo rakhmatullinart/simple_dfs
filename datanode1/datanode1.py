@@ -44,7 +44,7 @@ class Datanode:
         if op == 'WRITE_REPL':
             print('Going to recv file {}'.format(input_path))
             source_dn, source_addr = self.sock.accept()
-            tools.recv_file(source_dn, fs.GetLocalPath(input_path) + str('REPL'))
+            tools.recv_file(source_dn, fs.GetLocalPath(input_path))
 
             # send response to peer
             source_dn = socket.socket()
@@ -91,7 +91,7 @@ class Datanode:
         if op == 'READ':
             client = socket.socket()
             client.connect((client_ip, 7777))
-            tools.send_file(client, input_path)
+            tools.send_file(client, fs.GetLocalPath(input_path))
         if op == 'REMOVE':
             if input_path == '/':
                 fs.Initialize()

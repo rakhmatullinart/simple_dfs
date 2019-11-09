@@ -16,7 +16,7 @@ class NameNode:
         self.client = None
         self.clients = []
         self.sockets = None
-        self.datanodes = {'datanode1': ('localhost', 8801),  # my port I'' rceive connectoins on
+        self.datanodes = {'datanode1': ('localhost', 8801),  # my port I'll receive connections on
                           'datanode2': ('localhost', 8802),
                           'datanode3': ('localhost', 8803),
                           }
@@ -34,6 +34,7 @@ class NameNode:
             data = self.client.recv(1500)
             if data:
                 print('recv: ', data)
+                self.recover_from_fault()
                 self.handle(data, addr[0])
             else:
                 self.client.close()
@@ -60,10 +61,27 @@ class NameNode:
     def get_down_nodes(self):
         result = []
         for name, sock in self.sockets.items():
-            sock.send(str.encode('PING'))
-            data = sock.recv(5)
-            if not data: result.append(name)
+            try:
+                sock.send(str.encode('PING'))
+                data = sock.recv(5)
+                if not data: result.append(name)
+            except socket.error:
+                result.append(name)
         return result
+
+    def recover_from_fault(self):
+        fallen_nodes = self.get_down_nodes()
+        print(fallen_nodes, self.datanodes.keys())
+        if fallen_nodes and (len(self.datanodes) - len(fallen_nodes)) > 1:
+            for path, dn_from, dn_to in fs.GetFilesToReplicate(fallen_nodes, self.datanodes.keys()):
+                print('FROM FS: ', path, dn_from, dn_to)
+                self.to_dn(dn_from, 'WRITE_EXISTING_REPL {} _ {} {}'.format(path,
+                                                                            self.datanodes[dn_to][0],
+                                                                            '1' + str(self.datanodes[dn_to][1])))
+                self.to_dn(dn_to, 'WRITE_REPL {} _ _ {}'.format(path, '1' + str(self.datanodes[dn_from][1])))
+        for key in fallen_nodes: self.datanodes.pop(key, None)  # rm fallen nodes from their respective placeholders
+        for key in fallen_nodes: self.sockets.pop(key, None)
+        print('new dns: ', self.datanodes)
 
     def handle(self, query, client_ip):
         query = query.decode().split(' ')
@@ -78,28 +96,19 @@ class NameNode:
             self.client.send(b'1GB')
             self.to_dn('all', 'REMOVE {}'.format('/'))
         if op == 'CREATE':
+            self.recover_from_fault()
             ret = fs.GetFile(input_path)
             if ret == None:
                 print('CREATE {}'.format(input_path))
-                fs.FileCreate(input_path)
+                datanodes_to_put = list(self.datanodes.keys())[:max(len(self.datanodes), 2)]
+                fs.FileCreate(input_path, nodes=datanodes_to_put)
                 self.to_dn('all', 'CREATE {}'.format(input_path))
             elif -1:
                 self.client.send(b'ERROR THE DIRECTORY DOES NOT EXIST')
                 return
             self.client.send(b'SUCCESS')
         if op == 'WRITE':
-            fallen_nodes = self.get_down_nodes()
-            print(fallen_nodes, self.datanodes.keys())
-            if fallen_nodes and (len(self.datanodes) - len(fallen_nodes)) > 1:
-                for path, dn_from, dn_to in fs.GetFilesToReplicate(fallen_nodes, self.datanodes.keys()):
-                    print('FROM FS: ', path, dn_from, dn_to)
-                    self.to_dn(dn_from, 'WRITE_EXISTING_REPL {} _ {} {}'.format(path,
-                                                                                self.datanodes[dn_to][0],
-                                                                                '1' + str(self.datanodes[dn_to][1])))
-                    self.to_dn(dn_to, 'WRITE_REPL {} _ _ {}'.format(path, '1' + str(self.datanodes[dn_from][1])))
-            for key in fallen_nodes: self.datanodes.pop(key, None) # rm fallen nodes from their respective placeholders
-            for key in fallen_nodes: self.sockets.pop(key, None)
-            print('new dns: ', self.datanodes)
+            # self.recover_from_fault()
             print('WRITE')
             # check if possible to store file
             size = int(output_path)
@@ -123,10 +132,12 @@ class NameNode:
                     self.to_dn(int(datanodes_to_put[0][-1]), 'WRITE_ALONE {} {}'.format(result, client_ip))
 
         if op == 'READ':
+            # self.recover_from_fault()
             print('READ')
             self.client.send(b'SUCCESS')
             # define datanodes to store
-            self.to_dn(1, 'READ {} {}'.format(input_path, client_ip))
+            path, dn = fs.FileRead(input_path)
+            self.to_dn(1, 'READ {} {}'.format(path, client_ip))
         if op == 'REMOVE':
             print('REMOVE')
             self.client.send(b'SUCCESS')
@@ -147,12 +158,8 @@ class NameNode:
             msg = 'SUCCESS\n {}'.format(fs.DirRead(input_path))
             self.client.send(msg.encode())
             # define datanodes
-        if op == 'READDIR':
-            self.client.send(b'SUCCESS fileList')
-            # define datanodes
         if op == 'OPENDIR':
             self.client.send(b'SUCCESS')
-            # define datanodes
         if op == 'REMOVEDIR':
             print('REMOVEDIR')
             self.client.send(b'SUCCESS')
