@@ -207,7 +207,7 @@ def FileMove(filepath: str, dest: str) -> int:
             while True:
                 if i == -1:
                     break
-                if path[i] == '/':
+                if filepath[i] == '/':
                     break
                 filename += filepath[i]
                 i -= 1
@@ -285,6 +285,7 @@ def main():
     DirectoryMake('/dir1')
     DirectoryMake('/dir1/dir11')
     FileCreate('/dir1/dir11/file1.txt')
+    FileMove('/dir1/dir11/file1.txt', '/')
     #DirectoryDelete('/dir1')
 
     return
