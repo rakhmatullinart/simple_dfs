@@ -461,7 +461,7 @@ def FileRead(path: str) -> str:
     if f == None:
         return None
 
-    return f.getPath()
+    return f.getPath(), f.nodes[0]
 
 
 def FileDelete(path: str) -> str:

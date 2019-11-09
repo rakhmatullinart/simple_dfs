@@ -136,44 +136,78 @@ if __name__ == '__main__':
     c.connect_to_server()
     c.init_cluster()
 
-    option = input()
-    tokens = option.split(' ')
+    tokens = input().split(' ')
+    length = len(tokens)
     while tokens[0] != 'exit':
+        option = tokens[0]
         if option =='write':
-            # 1 arg is local file, 2 arg is DFS path
-            c.upload(tokens[1], tokens[2])
+            if length < 3:
+                print('Usage: write /local_path /DFS_path')
+            else:
+                # 1 arg is local file, 2 arg is DFS path
+                c.upload(tokens[1], tokens[2])
         if option =='read':
-            # 1 arg is DFS file path, 2 arg is local destination path
-            c.download(tokens[1], tokens[2])
+            if length < 3:
+                print('Usage: read /DFS_path /local_path')
+            else:
+                # 1 arg is DFS file path, 2 arg is local destination path
+                c.download(tokens[1], tokens[2])
         if option =='remove':
-            # Arg is DFS file path
-            c.remove(tokens[1])
+            if length < 2:
+                print('Usage: remove /DFS_path')
+            else:
+                # Arg is DFS file path
+                c.remove(tokens[1])
         if option =='info':
-            # Arg is DFS file path
-            c.fileinfo(tokens[1])
+            if length < 2:
+                print('Usage: info /DFS_path')
+            else:
+                # Arg is DFS file path
+                c.fileinfo(tokens[1])
         if option =='copy':
-            # 1 arg is DFS file path to copy, 2 arg is DFS destination path
-            c.copy(tokens[1], tokens[2])
+            if length < 3:
+                print('Usage: copy /DFS_path /DFS_dest_path')
+            else: 
+                # 1 arg is DFS file path to copy, 2 arg is DFS destination path
+                c.copy(tokens[1], tokens[2])
         if option =='move':
-            # 1 arg is DFS file path, 2 arg is DFS destination path
-            c.move(tokens[1], tokens[2])
+            if length < 3:
+                print('Usage: move /DFS_path /DFS_dest_path')
+            else:
+                # 1 arg is DFS file path, 2 arg is DFS destination path
+                c.move(tokens[1], tokens[2])
         if option =='dirread':
-            # Arg is DFS dir path
-            c.read_dir(tokens[1])
+            if length < 2:
+                print('Usage: dirread /DFS_path')
+            else:
+                # Arg is DFS dir path
+                c.read_dir(tokens[1])
         if option =='dirremove':
-            # Arg is DFS dir path
-            c.remove_dir(tokens[1])
+            if length < 2:
+                print('Usage: dirremove /DFS_path')
+            else:
+                # Arg is DFS dir path
+                c.remove_dir(tokens[1])
         if option =='dirmake':
-            # Arg is DFS dir path
-            c.make_dir(tokens[1])
+            if length < 2:
+                print('Usage: dirmake /DFS_path')
+            else:
+                # Arg is DFS dir path
+                c.make_dir(tokens[1])
         if option =='diropen':
-            # Arg is DFS dir path
-            c.open_dir(tokens[1])
+            if length < 2:
+                print('Usage: diropen /DFS_path')
+            else:
+                # Arg is DFS dir path
+                c.open_dir(tokens[1])
         if option =='init':
             # NO ARG
             c.init_cluster()
         if option =='create':
-            # Arg is DFS file path
-            c.touch(tokens[1])
-        option = input()
-        tokens = option.split(' ')
+            if length < 2:
+                print('Usage: create /DFS_path')
+            else:
+                # Arg is DFS file path
+                c.touch(tokens[1])
+        tokens = input().split(' ')
+        length = len(tokens)
