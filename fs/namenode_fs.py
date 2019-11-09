@@ -719,21 +719,21 @@ def main():
 
     print(DirCreate('mashinka'))
     print(DirCreate('pictures'))
-    print(FileCreate('report.pdf'))
+    print(FileCreate('report.pdf', nodes=['1','2']))
 
     print(DirOpen('mashinka'))
-    print(FileCreate('file.txt'))
+    print(FileCreate('file.txt', nodes=['1','2']))
     print(DirCreate('project'))
 
     print(DirOpen('./project'))
     print(DirCreate('baseline_model'))
     print(DirCreate('final_model'))
     print(DirCreate('final_model/some_dir'))
-    print(FileCreate('report2.txt'))
+    print(FileCreate('report2.txt', nodes=['1','2']))
 
     print(DirOpen('/pictures/'))
-    print(FileWrite('pikcha1.png', filesize=500))
-    print(FileCreate('pikcha2.png'))
+    print(FileWrite('pikcha1.png', filesize=500, nodes=['1','2']))
+    print(FileCreate('pikcha2.png', nodes=['1','2']))
     print(FileCopy('pikcha2.png', './'))
     print(FileMove('pikcha1.png', '/mashinka/project/baseline_model'))
 
@@ -744,7 +744,7 @@ def main():
     print(ChooseDataNodes([15, 50, 30, 340, 2800, 20000]))
 
     print(free_space)
-    print(FileWrite('someFile.dat', filesize=500))
+    print(FileWrite('someFile.dat', filesize=500, nodes=['1','2']))
     print(FileDelete('someFile.dat'))
 
     print(DirDelete('/mashinka'))
@@ -757,13 +757,11 @@ def main():
     print(DirCreate('/dir1/dir2/dir3'))
     print(DirCreate('/dir1/dir2/dir3/dir4'))
 
-    print(FileWrite('a.dat', nodes=['1','2'], filesize=100))
-    print(FileWrite('/dir1/b.dat', nodes=['2','3'], filesize=100))
-    print(FileWrite('/dir1/dir2/c.dat', nodes=['3','4'], filesize=100))
-    print(FileWrite('/dir1/dir2/dir3/d.dat', nodes=['4','5'], filesize=100))
-    print(FileWrite('/dir1/dir2/dir3/dir4/e.dat', nodes=['5','6'], filesize=100))
+    print(FileDelete('report.pdf'))
 
-    print(GetFilesToReplicate(fallen=['4'], was_alive=['1','2','3','4','5','6']))
+    print(FileWrite('a.dat', nodes=['1','2'], filesize=100))
+
+    print(GetFilesToReplicate(fallen=['1'], was_alive=['1','2','3']))
 
     print(DirDelete('dir1'))
 
