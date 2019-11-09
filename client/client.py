@@ -135,30 +135,45 @@ if __name__ == '__main__':
 
     c.connect_to_server()
     c.init_cluster()
+
     option = input()
-    while option != '-1':
-        if option =='1':
-            c.upload('helpers.py', 'VIRTUALFILE')
-        if option =='2':
-            c.download('VIRTUALFILE', "DOWNLOADEDSUKA")
-        if option =='3':
-            c.remove('VIRTUALFILE')
-        if option =='4':
-            c.fileinfo('VIRTUALFILE')
-        if option =='5':
-            c.copy('VIRTUALFILE', 'newFILE')
-        if option =='6':
-            c.move('VIRTUALFILE', 'newFILE')
-        if option =='7':
-            c.read_dir('DIR')
-        if option =='8':
-            c.remove_dir('DIR')
-        if option =='9':
-            c.make_dir('DIR')
-        if option =='10':
-            c.open_dir('DIR')
-        if option =='11':
+    tokens = option.split(' ')
+    while tokens[0] != 'exit':
+        if option =='write':
+            # 1 arg is local file, 2 arg is DFS path
+            c.upload(tokens[1], tokens[2])
+        if option =='read':
+            # 1 arg is DFS file path, 2 arg is local destination path
+            c.download(tokens[1], tokens[2])
+        if option =='remove':
+            # Arg is DFS file path
+            c.remove(tokens[1])
+        if option =='info':
+            # Arg is DFS file path
+            c.fileinfo(tokens[1])
+        if option =='copy':
+            # 1 arg is DFS file path to copy, 2 arg is DFS destination path
+            c.copy(tokens[1], tokens[2])
+        if option =='move':
+            # 1 arg is DFS file path, 2 arg is DFS destination path
+            c.move(tokens[1], tokens[2])
+        if option =='dirread':
+            # Arg is DFS dir path
+            c.read_dir(tokens[1])
+        if option =='dirremove':
+            # Arg is DFS dir path
+            c.remove_dir(tokens[1])
+        if option =='dirmake':
+            # Arg is DFS dir path
+            c.make_dir(tokens[1])
+        if option =='diropen':
+            # Arg is DFS dir path
+            c.open_dir(tokens[1])
+        if option =='init':
+            # NO ARG
             c.init_cluster()
-        if option =='12':
-            c.touch('NEWFILE')
+        if option =='create':
+            # Arg is DFS file path
+            c.touch(tokens[1])
         option = input()
+        tokens = option.split(' ')
