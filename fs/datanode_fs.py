@@ -203,13 +203,13 @@ def FileMove(filepath: str, dest: str) -> int:
 
             # Collecting filename for the funciton move
             filename = ''
-            i = len(path) - 1
+            i = len(filepath) - 1
             while True:
                 if i == -1:
                     break
                 if path[i] == '/':
                     break
-                filename += path[i]
+                filename += filepath[i]
                 i -= 1
             filename = filename[::-1]
             if dest[-1] != '/':
