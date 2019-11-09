@@ -1,5 +1,7 @@
 import socket
 import helpers as tools
+import os
+
 class Client:
     
     def __init__(self):
@@ -31,12 +33,12 @@ class Client:
         print('Status: {}'.format(data))
                     
     def upload(self, local_path, remote_path):
-        msg = 'WRITE {}'.format(remote_path)
+        msg = 'WRITE {} {}'.format(remote_path, os.path.getsize(local_path))
         self.namenode.send(str.encode(msg))
         data = self.namenode.recv(100).decode()
         print('Status: {}'.format(data))
         if data.split(' ')[0] == 'ERROR':
-            print(data.split(' ')[1])
+            if len(data.split(' ')) > 1: print(data.split(' ')[1])
             return
         datanode, addr = self.sock.accept()
         tools.send_file(datanode, local_path)
@@ -50,7 +52,7 @@ class Client:
         data = self.namenode.recv(100).decode()
         print('Status: {}'.format(data))
         if data.split(' ')[0] == 'ERROR':
-            print(data.split(' ')[1])
+            if len(data.split(' ')) > 1: print(data.split(' ')[1])
             return
         datanode, addr = self.sock.accept()
         tools.recv_file(datanode, local_path)
@@ -61,7 +63,7 @@ class Client:
         data = self.namenode.recv(100).decode()
         print('Status: {}'.format(data))
         if data.split(' ')[0] == 'ERROR':
-            print(data.split(' ')[1])
+            if len(data.split(' ')) > 1: print(data.split(' ')[1])
             return
 
     def fileinfo(self, remote_path):
@@ -70,7 +72,7 @@ class Client:
         data = self.namenode.recv(100).decode()
         print('Status: {}'.format(data))
         if data.split(' ')[0] == 'ERROR':
-            print(data.split(' ')[1])
+            if len(data.split(' ')) > 1: print(data.split(' ')[1])
             return
 
     def copy(self, init_path, dest_path):
@@ -79,7 +81,7 @@ class Client:
         data = self.namenode.recv(100).decode()
         print('Status: {}'.format(data))
         if data.split(' ')[0] == 'ERROR':
-            print(data.split(' ')[1])
+            if len(data.split(' ')) > 1: print(data.split(' ')[1])
             return
 
     def move(self, init_path, dest_path):
@@ -88,7 +90,7 @@ class Client:
         data = self.namenode.recv(100).decode()
         print('Status: {}'.format(data))
         if data.split(' ')[0] == 'ERROR':
-            print(data.split(' ')[1])
+            if len(data.split(' ')) > 1: print(data.split(' ')[1])
             return
 
     def read_dir(self, init_path):
@@ -97,7 +99,7 @@ class Client:
         data = self.namenode.recv(1024).decode()
         print('Status: {}'.format(data))
         if data.split(' ')[0] == 'ERROR':
-            print(data.split(' ')[1])
+            if len(data.split(' ')) > 1: print(data.split(' ')[1])
             return
 
     def open_dir(self, init_path):
@@ -106,7 +108,7 @@ class Client:
         data = self.namenode.recv(1024).decode()
         print('Status: {}'.format(data))
         if data.split(' ')[0] == 'ERROR':
-            print(data.split(' ')[1])
+            if len(data.split(' ')) > 1: print(data.split(' ')[1])
             return
 
     def make_dir(self, init_path):
@@ -115,7 +117,7 @@ class Client:
         data = self.namenode.recv(1024).decode()
         print('Status: {}'.format(data))
         if data.split(' ')[0] == 'ERROR':
-            print(data.split(' ')[1])
+            if len(data.split(' ')) > 1: print(data.split(' ')[1])
             return
 
     def remove_dir(self, init_path):
@@ -124,7 +126,7 @@ class Client:
         data = self.namenode.recv(1024).decode()
         print('Status: {}'.format(data))
         if data.split(' ')[0] == 'ERROR':
-            print(data.split(' ')[1])
+            if len(data.split(' ')) > 1: print(data.split(' ')[1])
             return
 
 
@@ -132,6 +134,7 @@ if __name__ == '__main__':
     c = Client()
 
     c.connect_to_server()
+    c.init_cluster()
     option = input()
     while option != '-1':
         if option =='1':
@@ -154,4 +157,8 @@ if __name__ == '__main__':
             c.make_dir('DIR')
         if option =='10':
             c.open_dir('DIR')
+        if option =='11':
+            c.init_cluster()
+        if option =='12':
+            c.touch('NEWFILE')
         option = input()

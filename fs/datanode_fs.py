@@ -17,7 +17,7 @@ def Initialize() -> int:
     Returns:
     - number of bytes that available for storage
     """
-       
+    if not os.path.exists(root_path): os.makedirs(root_path)
     for root, dirs, files in os.walk(root_path):
         for f in files:
             os.unlink(os.path.join(root, f))
@@ -94,11 +94,11 @@ def FileWrite(filepath: str, file_data) -> int:
         f.close()
 
         if log:
-            print('A new file', path, 'was created.')
+            print('A new file {}{}was created.'.format(path, filename))
         return 1
 
     else:
-        print('The directory', filepath, 'does not exists!')
+        print('The directory', path, 'does not exists!')
         return -1
     
 def FileDelete(filepath: str) -> int:

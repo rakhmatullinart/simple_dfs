@@ -433,6 +433,7 @@ def FileCreate(path: str, filesize=0, nodes=None, empty=True) -> str:
         f.nodes = nodes
         f.size = filesize
         dest.addFile(f)
+        print(free_space, f.size)
         return f.getPath()
 
     else:

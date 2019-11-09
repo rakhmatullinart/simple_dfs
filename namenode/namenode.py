@@ -1,6 +1,12 @@
 import socket
+import sys
+
+sys.path.insert(0, '..')
+from fs import namenode_fs as fs
+
+
 class NameNode:
-    
+
     def __init__(self):
         import socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -10,15 +16,15 @@ class NameNode:
         self.client = None
         self.clients = []
         self.sockets = None
-        self.datanodes = {'datanode1':('localhost', 8801), #my port I'' rceive connectoins on
-                          'datanode2':('localhost', 8802)}
-        
+        self.datanodes = {'datanode1': ('localhost', 8801),  # my port I'' rceive connectoins on
+                          'datanode2': ('localhost', 8802)}
+
     def start_server(self):
         print('Waiting datanodes to connect.')
         self.sockets = {}
         for name, (ip, port) in self.datanodes.items():
             self.sockets[name] = self.get_connection(port)
-            
+
         print('Waiting client to connect.')
         self.client, addr = self.sock.accept()
         print(str(addr) + ' connected')
@@ -31,7 +37,7 @@ class NameNode:
                 self.client.close()
                 print('Client disconnected')
                 break
-    
+
     def get_connection(self, dn_port):
         # returns socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,14 +47,22 @@ class NameNode:
         sock, addr = sock.accept()
         print(str(addr) + ' connected')
         return sock
-    
+
     def to_dn(self, i, msg):
-        if i=='all':
+        if i == 'all':
             for name, sock in self.sockets.items():
                 sock.send(str.encode(msg))
         else:
-            self.sockets['datanode'+str(i)].send(str.encode(msg))
-    
+            self.sockets['datanode' + str(i)].send(str.encode(msg))
+
+    def get_down_nodes(self):
+        result = []
+        for name, sock in self.sockets.items():
+            sock.send(str.encode('PING'))
+            data = sock.recv(5)
+            if not data: result.append(name)
+        return result
+
     def handle(self, query, client_ip):
         query = query.decode().split(' ')
         op = query[0]
@@ -58,21 +72,53 @@ class NameNode:
         print('path1: ', input_path)
         print('path2: ', output_path)
         if op == 'INIT':
-            # rm -r /*
-            # get fs size
-            self.client.send(b'100GB')
+            fs.Initialize()
+            self.client.send(b'1GB')
             self.to_dn('all', 'REMOVE {}'.format('/'))
         if op == 'CREATE':
-            # touch 'filename'
-            print('CREATE {}'.format(input_path))
+            ret = fs.GetFile(input_path)
+            if ret == None:
+                print('CREATE {}'.format(input_path))
+                fs.FileCreate(input_path)
+                self.to_dn('all', 'CREATE {}'.format(input_path))
+            elif -1:
+                self.client.send(b'ERROR THE DIRECTORY DOES NOT EXIST')
+                return
             self.client.send(b'SUCCESS')
         if op == 'WRITE':
-            print('WRITE ')
-            self.client.send(b'SUCCESS')
-            # define datanodes to store
-            self.to_dn(1, 'WRITE {} {} {}'.format(input_path, client_ip, 
-                                                    self.datanodes['datanode2'][0]))
-            self.to_dn(2, 'WRITE_REPL {}'.format(input_path))
+            fallen_nodes = self.get_down_nodes()
+            print(fallen_nodes, self.datanodes.keys())
+            if fallen_nodes and (len(self.datanodes) - len(fallen_nodes)) > 1:
+                for path, dn_from, dn_to in fs.GetFilesToReplicate(fallen_nodes, self.datanodes.keys()):
+                    print('FROM FS: ', path, dn_from, dn_to)
+                    self.to_dn(dn_from, 'WRITE_EXISTING_REPL {} _ {} {}'.format(path,
+                                                                                self.datanodes[dn_to][0],
+                                                                                '1' + str(self.datanodes[dn_to][1])))
+                    self.to_dn(dn_to, 'WRITE_REPL {} _ _ {}'.format(path, '1' + str(self.datanodes[dn_from][1])))
+            for key in fallen_nodes: self.datanodes.pop(key, None)
+            print('new dns: ', self.datanodes)
+            print('WRITE')
+            # check if possible to store file
+            size = int(output_path)
+            datanodes_to_put = list(self.datanodes.keys())[:max(len(self.datanodes), 2)]
+            result = fs.FileWrite(input_path, nodes=datanodes_to_put, filesize=size)
+            if result == None:
+                self.client.send(b'ERROR')
+                return
+            else:
+                self.client.send(b'SUCCESS')
+                if len(datanodes_to_put) > 1:
+                    self.to_dn(int(datanodes_to_put[1][-1]), 'WRITE {} {} {} {}'.format(result, client_ip,
+                                                                                        self.datanodes[
+                                                                                            datanodes_to_put[0]][0],
+                                                                                        '1' + str(self.datanodes[
+                                                                                                      datanodes_to_put[
+                                                                                                          0]][1])))
+                    self.to_dn(int(datanodes_to_put[0][-1]),
+                               'WRITE_REPL {} _ _ {}'.format(result, '1' + str(self.datanodes[datanodes_to_put[1]][1])))
+                else:
+                    self.to_dn(int(datanodes_to_put[0][-1]), 'WRITE_ALONE {} {}'.format(result, client_ip))
+
         if op == 'READ':
             print('READ')
             self.client.send(b'SUCCESS')
@@ -91,18 +137,18 @@ class NameNode:
             self.to_dn(2, 'COPY {} {}'.format(input_path, output_path))
         if op == 'MOVE':
             self.client.send(b'SUCCESS')
-            #define datanodes
+            # define datanodes
             self.to_dn(1, 'MOVE {} {}'.format(input_path, output_path))
             self.to_dn(2, 'MOVE {} {}'.format(input_path, output_path))
         if op == 'READDIR':
             self.client.send(b'SUCCESS fileList')
-            #define datanodes
+            # define datanodes
         if op == 'READDIR':
             self.client.send(b'SUCCESS fileList')
-            #define datanodes
+            # define datanodes
         if op == 'OPENDIR':
             self.client.send(b'SUCCESS')
-            #define datanodes
+            # define datanodes
         if op == 'REMOVEDIR':
             print('REMOVEDIR')
             self.client.send(b'SUCCESS')
@@ -111,9 +157,8 @@ class NameNode:
             print('MAKEDIR')
             self.client.send(b'SUCCESS')
             self.to_dn('all', 'MAKEDIR {}'.format(input_path))
-            
 
-            
+
 if __name__ == '__main__':
     n = NameNode()
 
