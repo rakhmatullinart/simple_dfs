@@ -150,7 +150,8 @@ class NameNode:
             self.to_dn('all', 'REMOVE {}'.format(path))
         if op == 'FILEINFO':
             print('send INFO')
-            self.client.send(b'SUCCESS {}'.format(fs.FileInfo(input_path)))
+            msg = 'SUCCESS {}'.format(fs.FileInfo(input_path))
+            self.client.send(msg.encode())
         if op == 'READDIR':
             msg = 'SUCCESS\n {}'.format(fs.DirRead(input_path))
             self.client.send(msg.encode())
