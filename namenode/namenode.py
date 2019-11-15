@@ -103,7 +103,7 @@ class NameNode:
             ret = fs.GetFile(input_path)
             if ret == None:
                 print('CREATE {}'.format(input_path))
-                datanodes_to_put = list(self.datanodes.keys())[:max(len(self.datanodes), 2)]
+                datanodes_to_put = list(self.datanodes.keys())
                 print("NODES TO PUT: ", datanodes_to_put)
                 fs.FileCreate(input_path, nodes=datanodes_to_put)
                 self.to_dn('all', 'CREATE {}'.format(input_path))
