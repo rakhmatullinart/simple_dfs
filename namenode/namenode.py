@@ -15,7 +15,10 @@ class NameNode:
         self.sock.listen()
         self.client = None
         self.clients = []
-        self.sockets = None
+        self.sockets = {'datanode1': self.get_connection2(8801),  # my port I'll receive connections on
+                          'datanode2': self.get_connection2(8802),
+                          'datanode3': self.get_connection2(8803),
+                          }
         self.datanodes = {'datanode1': ('localhost', 8801),  # my port I'll receive connections on
                           'datanode2': ('localhost', 8802),
                           'datanode3': ('localhost', 8803),
@@ -25,7 +28,7 @@ class NameNode:
         print('Waiting datanodes to connect.')
         self.sockets = {}
         for name, (ip, port) in self.datanodes.items():
-            self.sockets[name] = self.get_connection(port)
+            self.sockets[name] = self.get_connection(self.sockets[name])
 
         print('Waiting client to connect.')
         self.client, addr = self.sock.accept()
@@ -40,14 +43,17 @@ class NameNode:
                 print('Client disconnected')
                 break
 
-    def get_connection(self, dn_port):
+    def get_connection(self, sock):
+        sock, addr = sock.accept()
+        print(str(addr) + ' connected')
+        return sock
+
+    def get_connection2(self, dn_port):
         # returns socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind(('', dn_port))
         sock.listen()
-        sock, addr = sock.accept()
-        print(str(addr) + ' connected')
         return sock
 
     def to_dn(self, i, msg):
