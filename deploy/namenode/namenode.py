@@ -27,7 +27,6 @@ class NameNode:
         datanodes = {}
         with open(config_file, "r") as f:
             lines = f.readlines()
-            print(lines)
             for line in lines:
                 stripped_line = line.strip()
                 if stripped_line.startswith("#") or not stripped_line:
@@ -37,11 +36,10 @@ class NameNode:
                 if len(tokens) != 3:
                     raise ValueError(f"config file error: line {stripped_line}")
                 datanode_name, datanode_host, namenode_port = tokens
-                datanodes[datanode_name] = (
-                    os.environ.get(datanode_host, "localhost"),
-                    int(namenode_port),
-                )
-        print(datanodes)
+            datanodes[datanode_name] = (
+                os.environ.get(datanode_host, "localhost"),
+                namenode_port,
+            )
         return datanodes
 
     def start_server(self):
@@ -58,12 +56,7 @@ class NameNode:
                 data = self.client.recv(1500)
                 if data:
                     print("recv: ", data)
-                    # workaround for local and remote testing
-                    if self.datanodes[list(self.datanodes)[0]][0] == 'localhost':
-                        client_ip = 'localhost'
-                    else:
-                        client_ip = 'client'
-                    self.handle(data, client_ip)
+                    self.handle(data, "client")
                 else:
                     self.client.close()
                     print("Client disconnected")

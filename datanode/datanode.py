@@ -1,24 +1,40 @@
+import os
 import socket
-import sys
-import helpers as tools
+from time import sleep
 
-sys.path.insert(0, "..")
-from fs import datanode_fs as fs
+import helpers as tools
+import datanode_fs as fs
+
+# 18801
+# 18802
+# 18803
 
 
 class Datanode:
-    def __init__(self, my_port=18801):
+    def __init__(self,):
         """
         nn_ip: ip of Namenode
         """
         self.namenode = socket.socket()
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.bind(("", my_port))
+        self.sock.bind(("", int(os.environ["PORT"])))
         self.sock.listen()
 
-    def connect_to_server(self, ip="localhost", port=8801):
-        self.namenode.connect((ip, port))
+    def connect_to_server(self,):
+        print("here is executed")
+        while True:
+            try:
+                self.namenode.connect(
+                    (
+                        socket.gethostbyname(os.environ.get("SERVER_IP", "localhost")),
+                        int(os.environ["SERVER_PORT"]),
+                    )
+                )
+                break
+            except:
+                sleep(3)
+
         while True:
             data = self.namenode.recv(1500)
             if data:
@@ -47,7 +63,7 @@ class Datanode:
 
             # send response to peer
             source_dn = socket.socket()
-            source_dn.connect((source_addr[0], int(replica_port)))
+            source_dn.connect((output_path, int(replica_port)))
             source_dn.send(b"SUCCESS")
         if op == "WRITE":
             # download file from client
@@ -119,4 +135,4 @@ class Datanode:
 if __name__ == "__main__":
     d = Datanode()
 
-    d.connect_to_server(port=8801)
+    d.connect_to_server()

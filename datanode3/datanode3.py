@@ -3,12 +3,11 @@ import sys
 
 import helpers as tools
 
-sys.path.insert(0, '..')
+sys.path.insert(0, "..")
 from fs import datanode_fs as fs
 
 
 class Datanode:
-
     def __init__(self, my_port=18803):
         """
         nn_ip: ip of Namenode
@@ -16,42 +15,42 @@ class Datanode:
         self.namenode = socket.socket()
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.bind(('', my_port))
+        self.sock.bind(("", my_port))
         self.sock.listen()
 
-    def connect_to_server(self, ip='localhost', port=8803):
+    def connect_to_server(self, ip="localhost", port=8803):
         self.namenode.connect((ip, port))
         while True:
             data = self.namenode.recv(1500)
             if data:
-                print('recv: ', data)
+                print("recv: ", data)
                 self.handle(data)
             else:
-                print('Client disconnected')
+                print("Client disconnected")
                 break
 
     def handle(self, query):
-        query = query.decode().split(' ')
+        query = query.decode().split(" ")
         op = query[0]
         input_path = query[1] if len(query) > 1 else None
         output_path = query[2] if len(query) > 2 else None
         replica_ip = query[3] if len(query) > 3 else None
         replica_port = int(query[4]) if len(query) > 4 else None
-        print('op: ', op)
-        print('path1: ', input_path)
-        print('path2: ', output_path)
-        print('replicaIP: ', replica_ip)
-        print('replicaPORT: ', replica_port)
-        if op == 'WRITE_REPL':
-            print('Going to recv file {}'.format(input_path))
+        print("op: ", op)
+        print("path1: ", input_path)
+        print("path2: ", output_path)
+        print("replicaIP: ", replica_ip)
+        print("replicaPORT: ", replica_port)
+        if op == "WRITE_REPL":
+            print("Going to recv file {}".format(input_path))
             source_dn, source_addr = self.sock.accept()
             tools.recv_file(source_dn, fs.GetLocalPath(input_path))
 
             # send response to peer
             source_dn = socket.socket()
             source_dn.connect((source_addr[0], int(replica_port)))
-            source_dn.send(b'SUCCESS')
-        if op == 'WRITE':
+            source_dn.send(b"SUCCESS")
+        if op == "WRITE":
             # download file from client
             client_ip = output_path
             client = socket.socket()
@@ -72,7 +71,7 @@ class Datanode:
             client = socket.socket()
             client.connect((client_ip, 7777))
             client.send(result)
-        if op == 'WRITE_ALONE':
+        if op == "WRITE_ALONE":
             client_ip = output_path
             # download file from client
             client = socket.socket()
@@ -80,8 +79,8 @@ class Datanode:
             tools.recv_file(client, fs.GetLocalPath(input_path))
             client = socket.socket()
             client.connect((client_ip, 7777))
-            client.send(b'SUCCESS')
-        if op == 'WRITE_EXISTING_REPL':
+            client.send(b"SUCCESS")
+        if op == "WRITE_EXISTING_REPL":
             # send file to replica
             replica = socket.socket()
             replica.connect((replica_ip, replica_port))
@@ -91,33 +90,33 @@ class Datanode:
             replica, addr = self.sock.accept()
             result = replica.recv(10)
             print(result)
-        if op == 'READ':
+        if op == "READ":
             client_ip = output_path
             client = socket.socket()
             client.connect((client_ip, 7777))
             tools.send_file(client, fs.GetLocalPath(input_path))
-        if op == 'REMOVE':
-            if input_path == '/':
+        if op == "REMOVE":
+            if input_path == "/":
                 fs.Initialize()
             else:
                 fs.FileDelete(input_path)
-        if op == 'COPY':
+        if op == "COPY":
             fs.FileCopy(input_path, output_path)
-        if op == 'MOVE':
+        if op == "MOVE":
             fs.FileMove(input_path, output_path)
-        if op == 'CREATE':
+        if op == "CREATE":
             fs.FileCreate(input_path)
-        if op == 'PING':
-            print('PING came')
-            self.namenode.send(b'ALIVE')
-        if op == 'MAKEDIR':
-            print('MAKEDIR')
+        if op == "PING":
+            print("PING came")
+            self.namenode.send(b"ALIVE")
+        if op == "MAKEDIR":
+            print("MAKEDIR")
             fs.DirectoryMake(input_path)
-        if op == 'REMOVEDIR':
-            print('REMOVEDIR')
+        if op == "REMOVEDIR":
+            print("REMOVEDIR")
             fs.DirectoryDelete(input_path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     d = Datanode(my_port=18803)
     d.connect_to_server(port=8803)

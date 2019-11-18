@@ -1,0 +1,5 @@
+# define datanodes names, environment variables for hostnames and ports here, do not forget to put SERVER_PORT in corresponding datanode service in docker-compose.yml
+
+datanode1 DATANODE1_HOST 8801
+datanode2 DATANODE2_HOST 8802
+datanode3 DATANODE3_HOST 8803

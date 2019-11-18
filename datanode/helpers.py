@@ -5,6 +5,7 @@ def send_file(s, filepath):
     f = open(filepath, "rb")
     filesize = os.path.getsize(filepath)
     stat = lambda itr, filesize: int(itr * 1028 / filesize * 100)
+    # print('Size is: ', filesize)
     counter = 0
     l = f.read(1024)
     prev_pecent = 0
@@ -14,6 +15,7 @@ def send_file(s, filepath):
         progress = stat(counter, filesize)
         progress = progress if progress < 100 else 100
         if progress != prev_pecent:
+            # print(str(progress) + '%', end=' ')
             prev_pecent = progress
         l = f.read(1024)
     f.close()

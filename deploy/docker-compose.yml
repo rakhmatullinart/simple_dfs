@@ -1,0 +1,76 @@
+version: "3.7"
+
+# declare namenode, datanodes and client
+services:
+  namenode:
+    image: rakhmatullinart/namenode:develop
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.id == rc6c1ubgp0kmpkwf3v6hj50zm  # change to your node id
+
+    environment:
+      DATANODE1_HOST: datanode1
+      DATANODE2_HOST: datanode2
+      DATANODE3_HOST: datanode3
+      # add more datanodes if needed
+
+
+  datanode1:
+    image: rakhmatullinart/datanode:develop
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.id == sah2w4n4do4alvy1roguglt42  # change to your node id
+
+    environment:
+      SERVER_IP: namenode
+      PORT: 18801
+      SERVER_PORT: 8801
+
+
+  datanode2:
+    image: rakhmatullinart/datanode:develop
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.id == u01rl5dgeof6omgt6gl9xdkwk  # change to your node id
+
+    environment:
+      SERVER_IP: namenode
+      PORT: 18802
+      SERVER_PORT: 8802
+
+  datanode3:
+    image: rakhmatullinart/datanode:develop
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.id == xnefnl9g4hrn4mnrmvnwes57r  # change to your node id
+
+    environment:
+      SERVER_IP: namenode
+      PORT: 18803
+      SERVER_PORT: 8803
+
+  client:
+    image: rakhmatullinart/client:develop
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.id == xnefnl9g4hrn4mnrmvnwes57r  # change to your node id
+    environment:
+      SERVER_IP: anamenode
+      SERVER_PORT: 8800
+
+
+
+networks:
+ default:
+   external:
+     name: dfs_cluster
