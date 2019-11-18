@@ -644,9 +644,10 @@ def DirRead(path: str) -> str:
     if dr == None:
         return None
 
+    dir_abs_path = ''.join(GetAbsolutePath(path))
     info = ""
 
-    info += "Directory name: " + dr.name + "\n"
+    info += "CWD: {} \nDirectory name: {} \n".format(client_wd, dir_abs_path)
 
     info += "Files:\n"
     for f in dr.files:
@@ -747,6 +748,12 @@ def main():
     print(FileCreate("report2.txt", nodes=["1", "2"]))
 
     print(DirOpen("/pictures/"))
+
+    print('MY CHANGE\n\n\n')
+    print(DirRead("./"))
+
+
+
     print(FileWrite("pikcha1.png", filesize=500, nodes=["1", "2"]))
     print(FileCreate("pikcha2.png", nodes=["1", "2"]))
     print(FileCopy("pikcha2.png", "./"))
