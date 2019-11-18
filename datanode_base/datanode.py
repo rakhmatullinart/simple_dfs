@@ -134,6 +134,14 @@ class Datanode:
 
 
 if __name__ == "__main__":
+
+    orig_stdout = sys.stdout
+    f = open('STDOUT.txt', 'w+')
+    sys.stdout = f
+
     d = Datanode()
 
     d.connect_to_server()
+
+    sys.stdout = orig_stdout
+    f.close()
