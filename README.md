@@ -32,3 +32,20 @@ Better use **virtual environment**
 ### Architecture
 
 ![Alt Class+modules diagram](src/full_cd.png?raw=true "Title")
+
+
+### Communication protocols
+ 
+![](src/cp_INIT.png?raw=true "Title")
+![](src/cp_PUT.png?raw=true "Title")
+![](src/cp_GET.png?raw=true "Title")
+![](src/cp_LS.png?raw=true "Title")
+![](src/cp_CD.png?raw=true "Title")
+![](src/cp_COPY.png?raw=true "Title")
+![](src/cp_MOVE.png?raw=true "Title")
+![](src/cp_INFO.png?raw=true "Title")
+![](src/cp_MKDIR.png?raw=true "Title")
+![](src/cp_RMDIR.png?raw=true "Title")
+![](src/cp_REMOVE.png?raw=true "Title")
+![](src/cp_CREATE.png?raw=true "Title")
+
