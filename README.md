@@ -33,3 +33,7 @@ Better use **virtual environment**
           - node.id == sah2w4n4do4alvy1roguglt42  # change to your node id```
 5. Copy docker-compose.yml to master node
 6. `docker stack deploy -c docker-compose.yml dfs`
+
+### Architecture
+
+![Alt Class+modules diagram](src/full_cd.png?raw=true "Title")
