@@ -2,22 +2,16 @@
 Simple dfs implementation using Python and sockets
 
 ### Deployment local
-#### Option 1
 - execute command in separate terminal windows to see the logs
 ##### Start namenode and datanodes
 Better use **virtual environment**
-1. `python namenode/namenode.py`
-2. `python datanode1/datanode1.py`
-3. `python datanode2/datanode2.py`
-4. `python datanode3/datanode3.py`
+1. `cd namenode && python namenode.py`
+2. `cd datanode1 && python datanode.py`
+3. `cd datanode2 && python datanode.py`
+4. `cd datanode3 && python datanode.py`
 ##### Start client application
 1. `python client/client.py`
 
-#### Option 2
-- execute dfs in background (logs hidden)
-1. give permissions to sh script with `chmod +x run_dfs.sh`
-1. `./run_dfs.sh`
-2. `python client/client.py`
 
 ### Deployment with docker swarm
 
@@ -31,5 +25,6 @@ Better use **virtual environment**
     ```placement:
         constraints:
           - node.id == sah2w4n4do4alvy1roguglt42  # change to your node id```
-5. Copy docker-compose.yml to master node
+5. Copy deploy/docker-compose.yml to master node
 6. `docker stack deploy -c docker-compose.yml dfs`
+7. View docker stack online (need to set up visualizer) on http://18.221.112.199:8080 (just our case)

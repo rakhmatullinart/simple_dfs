@@ -65,12 +65,5 @@ services:
         constraints:
           - node.id == xnefnl9g4hrn4mnrmvnwes57r  # change to your node id
     environment:
-      SERVER_IP: anamenode
+      SERVER_IP: namenode
       SERVER_PORT: 8800
-
-
-
-networks:
- default:
-   external:
-     name: dfs_cluster

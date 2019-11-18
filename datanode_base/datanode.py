@@ -1,13 +1,12 @@
 import os
 import socket
 from time import sleep
-
-from datanode_base import helpers as tools
-from datanode_base import datanode_fs as fs
-
-# 18801
-# 18802
-# 18803
+if __name__ == "__main__":
+    import helpers as tools
+    import datanode_fs as fs
+else:
+    from datanode_base import helpers as tools
+    from datanode_base import datanode_fs as fs
 
 
 class Datanode:

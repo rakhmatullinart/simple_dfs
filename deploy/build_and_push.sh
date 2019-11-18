@@ -1,10 +1,10 @@
-docker build -t rakhmatullinart/namenode:$TAG -f namenode/Dockerfile ./namenode
+docker build -t rakhmatullinart/namenode:$TAG -f deploy/namenode/Dockerfile .
 docker push rakhmatullinart/namenode:$TAG
 
 
-docker build -t rakhmatullinart/datanode:$TAG -f datanode/Dockerfile ./datanode
+docker build -t rakhmatullinart/datanode:$TAG -f deploy/datanode/Dockerfile .
 docker push rakhmatullinart/datanode:$TAG
 
 
-docker build -t rakhmatullinart/client:$TAG -f client/Dockerfile ./client
+docker build -t rakhmatullinart/client:$TAG -f deploy/client/Dockerfile .
 docker push rakhmatullinart/client:$TAG

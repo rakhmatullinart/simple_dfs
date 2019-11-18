@@ -160,8 +160,9 @@ class Client:
     def run_cli():
         tokens = input().split(" ")
         length = len(tokens)
-        try:
-            while tokens[0] != "exit":
+
+        while tokens[0] != "exit":
+            try:
                 option = tokens[0]
                 if option == "put":
                     # put file into dfs
@@ -242,10 +243,10 @@ class Client:
                         c.touch(tokens[1])
                 else:
                     print(f"unknown command {tokens[0]}")
-                tokens = input().split(" ")
-                length = len(tokens)
-        except Exception as e:
-            print(str(e))
+            except Exception as e:
+                print(str(e))
+            tokens = input().split(" ")
+            length = len(tokens)
 
 
 if __name__ == "__main__":
