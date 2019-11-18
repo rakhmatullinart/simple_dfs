@@ -116,8 +116,10 @@ class NameNode:
                 )
                 self.to_dn(
                     dn_to[-1],
-                    "WRITE_REPL {} _ _ {}".format(
-                        path, "1" + str(self.datanodes[dn_from][1])
+                    "WRITE_REPL {} {} _ {}".format(
+                        path,
+                        str(self.datanodes[dn_from][0]),
+                        "1" + str(self.datanodes[dn_from][1])
                     ),
                 )
         else:
