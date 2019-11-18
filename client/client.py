@@ -163,75 +163,85 @@ class Client:
         try:
             while tokens[0] != "exit":
                 option = tokens[0]
-                if option == "write":
+                if option == "put":
+                    # put file into dfs
                     if length < 3:
-                        print("Usage: write /local_path /DFS_path")
+                        print("Usage: put /local_path /DFS_path")
                     else:
                         # 1 arg is local file, 2 arg is DFS path
                         c.upload(tokens[1], tokens[2])
-                if option == "read":
+                elif option == "get":
+                    # download file on host
                     if length < 3:
-                        print("Usage: read /DFS_path /local_path")
+                        print("Usage: get /DFS_path /local_path")
                     else:
                         # 1 arg is DFS file path, 2 arg is local destination path
                         c.download(tokens[1], tokens[2])
-                if option == "remove":
+                elif option == "rm":
+                    # remove file in dfs
                     if length < 2:
-                        print("Usage: remove /DFS_path")
+                        print("Usage: rm /DFS_path")
                     else:
                         # Arg is DFS file path
                         c.remove(tokens[1])
-                if option == "info":
+                elif option == "info":
+                    # information about file
                     if length < 2:
                         print("Usage: info /DFS_path")
                     else:
                         # Arg is DFS file path
                         c.fileinfo(tokens[1])
-                if option == "copy":
+                elif option == "cp":
+                    # copy file inside dfs
                     if length < 3:
-                        print("Usage: copy /DFS_path /DFS_dest_path")
+                        print("Usage: cp /DFS_path /DFS_dest_path")
                     else:
                         # 1 arg is DFS file path to copy, 2 arg is DFS destination path
                         c.copy(tokens[1], tokens[2])
-                if option == "move":
+                elif option == "mv":
+                    # move file inside dfs
                     if length < 3:
-                        print("Usage: move /DFS_path /DFS_dest_path")
+                        print("Usage: mv /DFS_path /DFS_dest_path")
                     else:
                         # 1 arg is DFS file path, 2 arg is DFS destination path
                         c.move(tokens[1], tokens[2])
-                if option == "dirread":
+                elif option == "ls":
+                    if len(tokens) == 1:
+                        tokens.append('./')
+                    if not tokens[1]:
+                        tokens[1] = './'
+                        # Arg is DFS file path
+                    c.read_dir(tokens[1])
+                elif option == "rmdir":
                     if length < 2:
-                        print("Usage: dirread /DFS_path")
-                    else:
-                        # Arg is DFS dir path
-                        c.read_dir(tokens[1])
-                if option == "dirremove":
-                    if length < 2:
-                        print("Usage: dirremove /DFS_path")
+                        print("Usage: rmdir /DFS_path")
                     else:
                         # Arg is DFS dir path
                         c.remove_dir(tokens[1])
-                if option == "dirmake":
+                elif option == "mkdir":
                     if length < 2:
-                        print("Usage: dirmake /DFS_path")
+                        print("Usage: mkdir /DFS_path")
                     else:
                         # Arg is DFS dir path
                         c.make_dir(tokens[1])
-                if option == "diropen":
+                elif option == "cd":
                     if length < 2:
-                        print("Usage: diropen /DFS_path")
+                        print("Usage: cd /DFS_path")
                     else:
                         # Arg is DFS dir path
                         c.open_dir(tokens[1])
-                if option == "init":
+                elif option == "init":
                     # NO ARG
                     c.init_cluster()
-                if option == "create":
+                elif option == "touch":
+                    # create empty file in dfs
                     if length < 2:
-                        print("Usage: create /DFS_path")
+                        print("Usage: touch /DFS_path")
                     else:
                         # Arg is DFS file path
                         c.touch(tokens[1])
+                else:
+                    print(f"unknown command {tokens[0]}")
                 tokens = input().split(" ")
                 length = len(tokens)
         except Exception as e:

@@ -2,8 +2,8 @@ import os
 import socket
 from time import sleep
 
-import helpers as tools
-import datanode_fs as fs
+from datanode_base import helpers as tools
+from datanode_base import datanode_fs as fs
 
 # 18801
 # 18802
@@ -22,7 +22,6 @@ class Datanode:
         self.sock.listen()
 
     def connect_to_server(self,):
-        print("here is executed")
         while True:
             try:
                 self.namenode.connect(

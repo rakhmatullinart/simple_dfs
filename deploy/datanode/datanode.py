@@ -22,7 +22,6 @@ class Datanode:
         self.sock.listen()
 
     def connect_to_server(self,):
-        print("here is executed")
         while True:
             try:
                 self.namenode.connect(
