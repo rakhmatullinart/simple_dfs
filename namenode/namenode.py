@@ -1,4 +1,5 @@
 import os
+import sys
 import socket
 import namenode_fs as fs
 
@@ -63,7 +64,9 @@ class NameNode:
                         client_ip = 'localhost'
                     else:
                         client_ip = 'client'
+                    sys.stdout.flush()
                     self.handle(data, client_ip)
+                    sys.stdout.flush()
                 else:
                     self.client.close()
                     print("Client disconnected")
@@ -231,7 +234,7 @@ class NameNode:
                 self.client.send(b"SUCCESS")
             else:
                 self.client.send(b"ACCEPT")
-                answer = self.client.recv(100)
+                answer = self.client.recv(100).decode()
                 if answer == "YES":
                     self.to_dn("all", "REMOVEDIR {}".format(fs.DirDelete(input_path)))
                     self.client.send(b"SUCCESS")
@@ -255,5 +258,12 @@ class NameNode:
 
 if __name__ == "__main__":
     n = NameNode()
-
+    
+    orig_stdout = sys.stdout
+    f = open('STDOUT.txt', 'w+')
+    sys.stdout = f
+     
     n.start_server()
+
+    sys.stdout = orig_stdout
+    f.close()

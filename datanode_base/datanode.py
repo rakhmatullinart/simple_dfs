@@ -1,4 +1,5 @@
 import os
+import sys
 import socket
 from time import sleep
 if __name__ == "__main__":
@@ -37,7 +38,9 @@ class Datanode:
             data = self.namenode.recv(1500)
             if data:
                 print("recv: ", data)
+                sys.stdout.flush()
                 self.handle(data)
+                sys.stdout.flush()
             else:
                 print("Client disconnected")
                 break
