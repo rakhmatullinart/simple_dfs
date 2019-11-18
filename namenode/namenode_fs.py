@@ -656,6 +656,8 @@ def DirRead(path: str) -> str:
     info += "Subdirectories:\n"
     for d in dr.subDirs:
         info += " " * 2 + d.name + "\n"
+    
+    info += "Disk space usage:  " + str(10**6 - free_space) + "/1000000 bytes\n" 
 
     return info
 
@@ -675,6 +677,7 @@ def DirDelete(path: str) -> str:
     dr = GetDir(path)
 
     if dr == None:
+        print('The directory', path, 'does not exists!')
         return None
 
     # Add free space
@@ -776,7 +779,12 @@ def main():
 
     print(DirCreate("/dir1"))
     print(DirCreate("/dir1/dir2"))
+    print(DirCreate("/dir1/dir21"))
+    print(DirCreate("/dir1/dir22"))
+    print(DirCreate("/dir1/dir23"))
     print(DirCreate("/dir1/dir2/dir3"))
+    print(DirCreate("/dir1/dir2/dir31"))
+    print(DirCreate("/dir1/dir2/dir32"))
     print(DirCreate("/dir1/dir2/dir3/dir4"))
 
     print(FileDelete("report.pdf"))
