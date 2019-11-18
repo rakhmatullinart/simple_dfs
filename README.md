@@ -28,3 +28,7 @@ Better use **virtual environment**
 5. Copy deploy/docker-compose.yml to master node
 6. `docker stack deploy -c docker-compose.yml dfs`
 7. View docker stack online (need to set up visualizer) on http://18.221.112.199:8080 (just our case)
+
+### Architecture
+
+![Alt Class+modules diagram](src/full_cd.png?raw=true "Title")
