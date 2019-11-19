@@ -1,0 +1,45 @@
+Waiting datanodes to connect.
+('127.0.0.1', 65040) connected
+('127.0.0.1', 65044) connected
+('127.0.0.1', 65045) connected
+Waiting client to connect.
+('127.0.0.1', 65046) connected
+recv:  b'INIT'
+op:  INIT
+path1:  None
+path2:  None
+Free space: 1024  bytes
+recv:  b'READDIR ./'
+op:  READDIR
+path1:  ./
+path2:  None
+[] dict_keys(['datanode1', 'datanode2', 'datanode3'])
+new dns:  {'datanode1': ('localhost', 8801), 'datanode2': ('localhost', 8802), 'datanode3': ('localhost', 8803)}
+recv:  b'WRITE FILE 9361'
+op:  WRITE
+path1:  FILE
+path2:  9361
+[] dict_keys(['datanode1', 'datanode2', 'datanode3'])
+new dns:  {'datanode1': ('localhost', 8801), 'datanode2': ('localhost', 8802), 'datanode3': ('localhost', 8803)}
+WRITE
+NODES TO PUT:  ['datanode1', 'datanode2']
+990639 9361
+recv:  b'READDIR ./'
+op:  READDIR
+path1:  ./
+path2:  None
+[] dict_keys(['datanode1', 'datanode2', 'datanode3'])
+new dns:  {'datanode1': ('localhost', 8801), 'datanode2': ('localhost', 8802), 'datanode3': ('localhost', 8803)}
+recv:  b'REMOVE FILE'
+op:  REMOVE
+path1:  FILE
+path2:  None
+[] dict_keys(['datanode1', 'datanode2', 'datanode3'])
+new dns:  {'datanode1': ('localhost', 8801), 'datanode2': ('localhost', 8802), 'datanode3': ('localhost', 8803)}
+REMOVE
+recv:  b'READDIR ./'
+op:  READDIR
+path1:  ./
+path2:  None
+[] dict_keys(['datanode1', 'datanode2', 'datanode3'])
+new dns:  {'datanode1': ('localhost', 8801), 'datanode2': ('localhost', 8802), 'datanode3': ('localhost', 8803)}

@@ -117,11 +117,13 @@ def FileDelete(filepath: str) -> int:
     Returns:
     1 if OK, -1 if not OK
     """
-    if os.path.isdir(root_path + filepath):
+
+    if os.path.exists(root_path + filepath):
 
         path = GetLocalPath(filepath)
 
         if os.path.exists(path):
+            print('remove file')
             os.remove(path)
             if log:
                 print("The file", path, "was removed.")

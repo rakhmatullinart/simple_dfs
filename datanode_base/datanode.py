@@ -115,6 +115,7 @@ class Datanode:
             if input_path == "/":
                 fs.Initialize()
             else:
+                print('dnRemove')
                 fs.FileDelete(input_path)
         if op == "COPY":
             fs.FileCopy(input_path, output_path)
