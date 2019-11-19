@@ -28,7 +28,6 @@ class NameNode:
         datanodes = {}
         with open(config_file, "r") as f:
             lines = f.readlines()
-            print(lines)
             for line in lines:
                 stripped_line = line.strip()
                 if stripped_line.startswith("#") or not stripped_line:
@@ -42,7 +41,6 @@ class NameNode:
                     os.environ.get(datanode_host, "localhost"),
                     int(namenode_port),
                 )
-        print(datanodes)
         return datanodes
 
     def start_server(self):

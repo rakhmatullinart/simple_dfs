@@ -20,7 +20,6 @@ services:
   datanode1:
     image: rakhmatullinart/datanode:develop
     deploy:
-      replicas: 1
       placement:
         constraints:
           - node.id == sah2w4n4do4alvy1roguglt42  # change to your node id
@@ -34,7 +33,6 @@ services:
   datanode2:
     image: rakhmatullinart/datanode:develop
     deploy:
-      replicas: 1
       placement:
         constraints:
           - node.id == u01rl5dgeof6omgt6gl9xdkwk  # change to your node id
@@ -47,7 +45,6 @@ services:
   datanode3:
     image: rakhmatullinart/datanode:develop
     deploy:
-      replicas: 1
       placement:
         constraints:
           - node.id == xnefnl9g4hrn4mnrmvnwes57r  # change to your node id
@@ -63,7 +60,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.id == xnefnl9g4hrn4mnrmvnwes57r  # change to your node id
+          - node.id == ul0gesiry7fk2sre3igo70dq1  # change to your node id
     environment:
       SERVER_IP: namenode
       SERVER_PORT: 8800
